@@ -18,15 +18,11 @@ def parse_book_page(page_content):
     title, author = soup.find('td', class_='ow_px_td').find('h1').text.split('::')
 
     parsed_genres = soup.find('span', class_='d_book').find_all('a')
-    genres = []
-    for genre in parsed_genres:
-        genres.append(genre.text)
+    genres = [genre.text for genre in parsed_genres]
 
-    comments = []
     parsed_comments = soup.find_all('div', class_='texts')
-    if parsed_comments:
-        for comment in parsed_comments:
-            comments.append(comment.find('span', class_='black').text) 
+    comments = [comment.find('span', class_='black').text for comment in parsed_comments]
+
 
     image_path = soup.find('div', class_='bookimage').find('img')['src']
     image_url = urljoin('https://tululu.org/', image_path)
