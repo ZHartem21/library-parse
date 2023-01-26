@@ -51,6 +51,30 @@ def parse_genre(id):
     return genres
 
 
+def parse_book_page(page_content):
+    soup = BeautifulSoup(page_content, 'lxml')
+
+    title, author = soup.find('td', class_='ow_px_td').find('h1').text.split('::')
+
+    parsed_genres = soup.find('span', class_='d_book').find_all('a')
+    genres = []
+    for genre in parsed_genres:
+        genres.append(genre.text)
+
+    comments = []
+    parsed_comments = soup.find_all('div', class_='texts')
+    if parsed_comments:
+        for comment in parsed_comments:
+            comments.append(comment.find('span', class_='black').text) 
+
+    book_info = {
+        'title': title.strip(),
+        'author': author.strip(),
+        'genres': genres,
+        'comments': comments,
+    }
+
+
 def get_book_image_url_by_id(id):
     url = f'https://tululu.org/b{id}'
     try:
@@ -98,7 +122,6 @@ def download_books_in_folder(book_ids, book_folder, image_folder, comment_folder
     for id in book_ids:
         download_text(id, book_folder)
         download_image(id, image_folder)
-        download_comments(id, comment_folder)
 
 
 def main():
