@@ -12,25 +12,6 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def download_comments(id, folder):
-    url = f'https://tululu.org/b{id}'
-    os.makedirs(folder, exist_ok=True)
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        check_for_redirect(response)
-        soup = BeautifulSoup(response.text, 'lxml')
-        title = soup.find('td', class_='ow_px_td').find('h1').text.split('::')[0]
-        found_comments = soup.find_all('div', class_='texts')
-        if found_comments:
-            with open(sanitize_filepath(os.path.join(folder, sanitize_filename(f'Комменты к {id}. {title}.txt'))), 'w', encoding="utf-8") as file:
-                for comment in found_comments:
-                    comment_text = comment.find('span', class_='black').text
-                    file.write(f'{comment_text} \n')
-    except requests.HTTPError:
-        return None
-
-
 def parse_book_page(page_content):
     soup = BeautifulSoup(page_content, 'lxml')
 
