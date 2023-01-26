@@ -39,6 +39,18 @@ def download_comments(id, folder):
         return None
 
 
+def parse_genre(id):
+    url = f'https://tululu.org/b{id}'
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, 'lxml')
+    parsed_genres = soup.find('span', class_='d_book').find_all('a')
+    genres = []
+    for genre in parsed_genres:
+        genres.append(genre.text)
+    return genres
+
+
 def get_book_image_url_by_id(id):
     url = f'https://tululu.org/b{id}'
     try:
@@ -91,8 +103,8 @@ def download_books_in_folder(book_ids, book_folder, image_folder, comment_folder
 
 def main():
     book_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    download_books_in_folder(book_ids, 'books', 'images', 'comments')
-
+    # download_books_in_folder(book_ids, 'books', 'images', 'comments')
+    print(parse_genre(9))
 
 if __name__ == '__main__':
     main()
