@@ -43,7 +43,7 @@ def download_image(url, filename, folder='images/'):
     if url:
         response = requests.get(url)
         response.raise_for_status()
-        with open(sanitize_filepath(os.path.join(folder, sanitize_filename(filename))), 'wb') as file:
+        with open(sanitize_filepath(os.path.join(folder, filename)), 'wb') as file:
             file.write(response.content)
 
 
@@ -52,7 +52,7 @@ def download_text(url, book_id, filename, folder='books/'):
     response = requests.get(url, params={'id':book_id})
     response.raise_for_status()
     check_for_redirect(response)
-    with open(sanitize_filepath(os.path.join(folder, sanitize_filename(filename))), 'wb') as file:
+    with open(sanitize_filepath(os.path.join(folder, filename)), 'wb') as file:
         file.write(response.content)
 
 
