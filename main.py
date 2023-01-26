@@ -40,11 +40,10 @@ def parse_book_page(response):
 
 def download_image(url, filename, folder='images/'):
     os.makedirs(folder, exist_ok=True)
-    if url:
-        response = requests.get(url)
-        response.raise_for_status()
-        with open(sanitize_filepath(os.path.join(folder, filename)), 'wb') as file:
-            file.write(response.content)
+    response = requests.get(url)
+    response.raise_for_status()
+    with open(sanitize_filepath(os.path.join(folder, filename)), 'wb') as file:
+        file.write(response.content)
 
 
 def download_text(url, book_id, filename, folder='books/'):
@@ -66,8 +65,9 @@ def download_books(start_id, end_id):
             parsed_book = parse_book_page(response)
             text_filename = f'{book_id}. {parsed_book["title"]}.txt'
             download_text('https://tululu.org/txt.php', book_id, text_filename)
-            image_filename = f'{book_id}.jpg'
-            download_image(parsed_book['image_url'], image_filename)
+            if parsed_book['image_url']:
+                image_filename = f'{book_id}.jpg'
+                download_image(parsed_book['image_url'], image_filename)
             print(parsed_book['title'], parsed_book['author'], parsed_book['genres'])
         except requests.HTTPError:
             print(f'Не получается скачать id - {book_id}')
