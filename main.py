@@ -1,10 +1,11 @@
 import argparse
 import os
+import time
 from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
-from pathvalidate import sanitize_filename, sanitize_filepath
+from pathvalidate import sanitize_filepath
 
 
 def check_for_redirect(response):
@@ -70,6 +71,7 @@ def download_books(start_id, end_id):
                 download_image(parsed_book['image_url'], image_filename)
             print(parsed_book['title'], parsed_book['author'], parsed_book['genres'])
         except requests.ConnectionError:
+            time.sleep(10)
             book_id = book_id - 1
             continue
         except requests.HTTPError:
