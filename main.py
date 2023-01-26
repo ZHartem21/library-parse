@@ -62,26 +62,26 @@ def download_text(url, filename, folder='books/'):
 
 
 def download_books(start_id, end_id):
-    for id in range(start_id, end_id+1):
+    for book_id in range(start_id, end_id+1):
         try:
-            url = f'https://tululu.org/b{id}'
+            url = f'https://tululu.org/b{book_id}'
             response = requests.get(url)
             response.raise_for_status()
             check_for_redirect(response)
             book_info = parse_book_page(response.text)
-            text_filename = f'{id}. {book_info["title"]}.txt'
-            download_text(f'https://tululu.org/txt.php?id={id}', text_filename)
-            image_filename = f'{id}.jpg'
+            text_filename = f'{book_id}. {book_info["title"]}.txt'
+            download_text(f'https://tululu.org/txt.php?id={book_id}', text_filename)
+            image_filename = f'{book_id}.jpg'
             download_image(book_info['image_url'], image_filename)
             print(book_info['title'], book_info['author'], book_info['genres'])
         except requests.HTTPError:
-            print(f'Не получается скачать id - {id}')
+            print(f'Не получается скачать id - {book_id}')
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('start_id', help='Начальный id', type=int)
-    parser.add_argument('end_id', help='Конечный id', type=int)
+    parser.add_argument('start_id', help='Начальный book_id', type=int)
+    parser.add_argument('end_id', help='Конечный book_id', type=int)
     args = parser.parse_args()
     download_books(args.start_id, args.end_id)
 
