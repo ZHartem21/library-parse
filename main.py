@@ -20,6 +20,25 @@ def get_book_info_by_id(id):
     return title.strip(), author.strip()
 
 
+def download_comments(id, folder):
+    url = f'https://tululu.org/b{id}'
+    os.makedirs(folder, exist_ok=True)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        check_for_redirect(response)
+        soup = BeautifulSoup(response.text, 'lxml')
+        title = soup.find('td', class_='ow_px_td').find('h1').text.split('::')[0]
+        found_comments = soup.find_all('div', class_='texts')
+        if found_comments:
+            with open(sanitize_filepath(os.path.join(folder, sanitize_filename(f'Комменты к {id}. {title}.txt'))), 'w', encoding="utf-8") as file:
+                for comment in found_comments:
+                    comment_text = comment.find('span', class_='black').text
+                    file.write(f'{comment_text} \n')
+    except requests.HTTPError:
+        return None
+
+
 def get_book_image_url_by_id(id):
     url = f'https://tululu.org/b{id}'
     try:
@@ -63,15 +82,16 @@ def download_text(id, folder):
         print(f'id {id} - неверный')
 
 
-def download_books_in_folder(book_ids, book_folder, image_folder):
+def download_books_in_folder(book_ids, book_folder, image_folder, comment_folder):
     for id in book_ids:
         download_text(id, book_folder)
         download_image(id, image_folder)
+        download_comments(id, comment_folder)
 
 
 def main():
     book_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    download_books_in_folder(book_ids, 'books', 'images')
+    download_books_in_folder(book_ids, 'books', 'images', 'comments')
 
 
 if __name__ == '__main__':
