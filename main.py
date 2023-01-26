@@ -12,8 +12,8 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def parse_book_page(page_content):
-    soup = BeautifulSoup(page_content, 'lxml')
+def parse_book_page(response):
+    soup = BeautifulSoup(response.text, 'lxml')
 
     title, author = soup.find('td', class_='ow_px_td').find('h1').text.split('::')
 
@@ -23,9 +23,8 @@ def parse_book_page(page_content):
     parsed_comments = soup.find_all('div', class_='texts')
     comments = [comment.find('span', class_='black').text for comment in parsed_comments]
 
-
     image_path = soup.find('div', class_='bookimage').find('img')['src']
-    image_url = urljoin('https://tululu.org/', image_path)
+    image_url = urljoin(response.url, image_path)
     if image_path == '/images/nopic.gif':
         image_url = None
 
@@ -64,7 +63,7 @@ def download_books(start_id, end_id):
             response = requests.get(url)
             response.raise_for_status()
             check_for_redirect(response)
-            parsed_book = parse_book_page(response.text)
+            parsed_book = parse_book_page(response)
             text_filename = f'{book_id}. {parsed_book["title"]}.txt'
             download_text('https://tululu.org/txt.php', book_id, text_filename)
             image_filename = f'{book_id}.jpg'
