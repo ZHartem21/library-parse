@@ -33,14 +33,14 @@ def parse_book_page(page_content):
     if image_path == '/images/nopic.gif':
         image_url = None
 
-    book_info = {
+    parsed_book = {
         'title': title.strip(),
         'author': author.strip(),
         'genres': genres,
         'comments': comments,
         'image_url': image_url,
     }
-    return book_info
+    return parsed_book
 
 
 def download_image(url, filename, folder='images/'):
@@ -68,12 +68,12 @@ def download_books(start_id, end_id):
             response = requests.get(url)
             response.raise_for_status()
             check_for_redirect(response)
-            book_info = parse_book_page(response.text)
-            text_filename = f'{book_id}. {book_info["title"]}.txt'
+            parsed_book = parse_book_page(response.text)
+            text_filename = f'{book_id}. {parsed_book["title"]}.txt'
             download_text(f'https://tululu.org/txt.php?id={book_id}', text_filename)
             image_filename = f'{book_id}.jpg'
-            download_image(book_info['image_url'], image_filename)
-            print(book_info['title'], book_info['author'], book_info['genres'])
+            download_image(parsed_book['image_url'], image_filename)
+            print(parsed_book['title'], parsed_book['author'], parsed_book['genres'])
         except requests.HTTPError:
             print(f'Не получается скачать id - {book_id}')
 
