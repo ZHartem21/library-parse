@@ -52,9 +52,9 @@ def download_image(url, filename, folder='images/'):
             file.write(response.content)
 
 
-def download_text(url, filename, folder='books/'):
+def download_text(url, book_id, filename, folder='books/'):
     os.makedirs(folder, exist_ok=True)
-    response = requests.get(url)
+    response = requests.get(url, params={'id':book_id})
     response.raise_for_status()
     check_for_redirect(response)
     with open(sanitize_filepath(os.path.join(folder, sanitize_filename(filename))), 'wb') as file:
@@ -70,7 +70,7 @@ def download_books(start_id, end_id):
             check_for_redirect(response)
             parsed_book = parse_book_page(response.text)
             text_filename = f'{book_id}. {parsed_book["title"]}.txt'
-            download_text(f'https://tululu.org/txt.php?id={book_id}', text_filename)
+            download_text('https://tululu.org/txt.php', book_id, text_filename)
             image_filename = f'{book_id}.jpg'
             download_image(parsed_book['image_url'], image_filename)
             print(parsed_book['title'], parsed_book['author'], parsed_book['genres'])
