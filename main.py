@@ -69,6 +69,9 @@ def download_books(start_id, end_id):
                 image_filename = f'{book_id}.jpg'
                 download_image(parsed_book['image_url'], image_filename)
             print(parsed_book['title'], parsed_book['author'], parsed_book['genres'])
+        except requests.ConnectionError:
+            book_id = book_id - 1
+            continue
         except requests.HTTPError:
             print(f'Не получается скачать id - {book_id}')
 
