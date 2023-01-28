@@ -49,7 +49,7 @@ def download_image(url, filename, folder='images/'):
 
 def download_text(url, book_id, filename, folder='books/'):
     os.makedirs(folder, exist_ok=True)
-    response = requests.get(url, params={'id':book_id})
+    response = requests.get(url, params={'id': book_id})
     response.raise_for_status()
     check_for_redirect(response)
     with open(sanitize_filepath(os.path.join(folder, filename)), 'wb') as file:
