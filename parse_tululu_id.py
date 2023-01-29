@@ -1,7 +1,7 @@
 import argparse
 import os
 import time
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,48 +15,65 @@ def check_for_redirect(response):
 
 def parse_book_page(response):
     soup = BeautifulSoup(response.text, 'lxml')
+    title_and_author_selector = '#content > h1:nth-child(2)'
+    title, author = soup.select_one(title_and_author_selector).text.split('::')
 
-    title, author = soup.find('td', class_='ow_px_td').find('h1').text.split('::')
-
-    parsed_genres = soup.find('span', class_='d_book').find_all('a')
+    genre_selector = 'td.ow_px_td span.d_book a'
+    parsed_genres = soup.select(genre_selector)
     genres = [genre.text for genre in parsed_genres]
 
-    parsed_comments = soup.find_all('div', class_='texts')
-    comments = [comment.find('span', class_='black').text for comment in parsed_comments]
+    comment_selector = 'div.texts span.black'
+    parsed_comments = soup.select(comment_selector)
+    comments = [comment.text for comment in parsed_comments]
 
-    image_path = soup.find('div', class_='bookimage').find('img')['src']
-    image_url = urljoin(response.url, image_path)
-    if image_path == '/images/nopic.gif':
-        image_url = None
+    image_selector = 'div.bookimage img'
+    image_source = soup.select_one(image_selector)['src']
+    image_path = urljoin(response.url, image_source)
+    if image_source == '/images/nopic.gif':
+        image_path = None
+    try:
+        text_selector = 'a[href^="/txt.php?"]'
+        text_path = soup.select_one(text_selector)['href']
+    except IndexError:
+        text_path = None
+    except TypeError:
+        text_path = None
 
     parsed_book = {
         'title': title.strip(),
         'author': author.strip(),
-        'genres': genres,
+        'image_path': image_path,
+        'text_path': text_path,
         'comments': comments,
-        'image_url': image_url,
+        'genres': genres,
     }
     return parsed_book
 
 
-def download_image(url, filename, folder='images/'):
+def download_image(image_path, dest_folder):
+    folder = os.path.join(dest_folder, 'images')
     os.makedirs(folder, exist_ok=True)
+    library_url = 'https://tululu.org/'
+    url = urljoin(library_url, image_path)
     response = requests.get(url)
     response.raise_for_status()
+    filename = urlparse(url).path.split('/')[2]
     with open(sanitize_filepath(os.path.join(folder, filename)), 'wb') as file:
         file.write(response.content)
 
 
-def download_text(url, book_id, filename, folder='books/'):
+def download_text(text_path, book_title, dest_folder):
+    folder = os.path.join(dest_folder, 'books')
     os.makedirs(folder, exist_ok=True)
-    response = requests.get(url, params={'id': book_id})
+    library_url = 'https://tululu.org/'
+    url = urljoin(library_url, text_path)
+    response = requests.get(url)
     response.raise_for_status()
-    check_for_redirect(response)
-    with open(sanitize_filepath(os.path.join(folder, filename)), 'wb') as file:
+    with open(sanitize_filepath(os.path.join(folder, f'{book_title}.txt')), 'wb') as file:
         file.write(response.content)
 
 
-def download_books(start_id, end_id):
+def download_books(start_id, end_id, dest_folder='tulululib'):
     for book_id in range(start_id, end_id+1):
         try:
             url = f'https://tululu.org/b{book_id}'
@@ -64,12 +81,10 @@ def download_books(start_id, end_id):
             response.raise_for_status()
             check_for_redirect(response)
             parsed_book = parse_book_page(response)
-            text_filename = f'{book_id}. {parsed_book["title"]}.txt'
-            download_text('https://tululu.org/txt.php', book_id, text_filename)
-            if parsed_book['image_url']:
-                image_filename = f'{book_id}.jpg'
-                download_image(parsed_book['image_url'], image_filename)
-            print(parsed_book['title'], parsed_book['author'], parsed_book['genres'])
+            if parsed_book['text_path']:
+                download_text(parsed_book['text_path'], parsed_book['title'], dest_folder)
+            if parsed_book['image_path']:
+                download_image(parsed_book['image_path'], dest_folder)
         except requests.ConnectionError:
             time.sleep(10)
             book_id = book_id - 1
