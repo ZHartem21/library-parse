@@ -67,7 +67,6 @@ def parse_category(page_start, page_end, category='l55'):
     for page in range(page_start, page_end+1):
         try:
             url = urljoin(category_url, str(page))
-            print(url)
             response = requests.get(url)
             response.raise_for_status()
             check_for_redirect(response)
