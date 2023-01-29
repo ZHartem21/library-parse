@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import time
 from urllib.parse import urljoin, urlparse
 
 import requests
@@ -74,6 +75,10 @@ def parse_category(page_start, page_end, category='l55'):
         except requests.HTTPError:
             print(f'Страницы {page} Не существует, загружаются книги на страницах {page_start} - {page - 1}')
             break
+        except requests.ConnectionError:
+            time.sleep(10)
+            page = page - 1
+            continue
     return parsed_book_urls
 
 
