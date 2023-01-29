@@ -60,7 +60,7 @@ def parse_book_page(response):
 
 
 def parse_category(page_start, page_end, category='l55'):
-    category = category + '/'
+    category = f'{category}/'
     category_url = urljoin('https://tululu.org/', category)
     parsed_book_urls = []
     for page in range(page_start, page_end+1):
