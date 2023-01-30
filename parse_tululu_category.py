@@ -54,8 +54,8 @@ def download_books_in_category(page_start, page_end, category, dest_folder, skip
                 parsed_books.append(parsed_book)
             if not skip_text and parsed_book['text_path']:
                 download_text(parsed_book['text_path'], parsed_book['title'], dest_folder)
-                if not skip_img and parsed_book['image_path']:
-                    download_image(parsed_book['image_path'], dest_folder)
+            if not skip_img and parsed_book['image_path']:
+                download_image(parsed_book['image_path'], dest_folder)
         except requests.HTTPError:
             print(f'Ссылка {book_url} - неверная')
             continue
