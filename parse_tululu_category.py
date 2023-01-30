@@ -7,12 +7,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filepath
-from parse_tululu_id import parse_book_page, download_image, download_text
-
-
-def check_for_redirect(response):
-    if response.url == 'https://tululu.org/':
-        raise requests.HTTPError
+from parse_tululu_id import parse_book_page, download_image, download_text, check_for_redirect
 
 
 def parse_category_page(response):
