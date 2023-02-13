@@ -8,10 +8,7 @@ from more_itertools import chunked
 
 
 def get_book_descriptions(book_information):
-    with open(book_information, "r", encoding="utf8") as json_file:
-        books_json = json_file.read()
-
-    books = json.loads(books_json)
+    books = json.loads(book_information)
     for book in books:
         if book['image_path']:
             book['image_path'] = os.path.join('../tulululib/images', book['image_path'].split("/")[4]).replace('\\', '/')
@@ -37,7 +34,7 @@ def on_reload(book_information):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('book_information', help='Название .json файла с информацией о книгах, по умолчанию "book_information.json"', type=str, default='book_information.json')
+    parser.add_argument('--book_information', help='Название .json файла с информацией о книгах, по умолчанию "book_information.json"', type=str, default='book_information.json')
     args = parser.parse_args()
     on_reload(args.book_information)
     server = Server()
