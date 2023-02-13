@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 
@@ -6,8 +7,8 @@ from livereload import Server
 from more_itertools import chunked
 
 
-def get_book_descriptions():
-    with open(os.path.join('tulululib', 'book_information.json'), "r", encoding="utf8") as json_file:
+def get_book_descriptions(book_information):
+    with open(book_information, "r", encoding="utf8") as json_file:
         books_json = json_file.read()
 
     books = json.loads(books_json)
@@ -19,13 +20,13 @@ def get_book_descriptions():
     return books
 
 
-def on_reload():
+def on_reload(book_information):
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template('template.html')
-    books = get_book_descriptions()
+    books = get_book_descriptions(book_information)
     chunked_books = list(chunked(books, 20))
     os.makedirs('pages', exist_ok=True)
     for i, books_chunk in enumerate(chunked_books):
@@ -35,7 +36,10 @@ def on_reload():
 
 
 def main():
-    on_reload()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('book_information', help='Название .json файла с информацией о книгах, по умолчанию "book_information.json"', type=str, default='book_information.json')
+    args = parser.parse_args()
+    on_reload(args.book_information)
     server = Server()
     server.watch('template.html', on_reload)
     server.serve(root='.', default_filename='pages/index1.html')
