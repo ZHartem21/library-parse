@@ -17,14 +17,14 @@ def get_book_descriptions(book_information):
     return book_descriptions
 
 
-def on_reload(book_information):
+def on_reload(book_information, cards_per_page):
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template('template.html')
     book_descriptions = get_book_descriptions(book_information)
-    chunked_book_descriptions = list(chunked(book_descriptions, 20))
+    chunked_book_descriptions = list(chunked(book_descriptions, cards_per_page))
     os.makedirs('pages', exist_ok=True)
     for i, books_chunk in enumerate(chunked_book_descriptions):
         rendered_page = template.render(books=books_chunk, pages=range(0, len(chunked_book_descriptions)), current_page=i, last_page=len(chunked_book_descriptions))
@@ -35,8 +35,9 @@ def on_reload(book_information):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--book_information', help='Название .json файла с информацией о книгах, по умолчанию "book_information.json"', type=str, default='book_information.json')
+    parser.add_argument('--cards_per_page', help='Количество карточек книг на одной странице', type=int, default=20)
     args = parser.parse_args()
-    on_reload(args.book_information)
+    on_reload(args.book_information, args.cards_per_page)
     server = Server()
     server.watch('template.html', on_reload)
     server.serve(root='.', default_filename='pages/index1.html')
