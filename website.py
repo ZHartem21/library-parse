@@ -26,9 +26,9 @@ def on_reload(book_information, cards_per_page):
     book_descriptions = get_book_descriptions(book_information)
     chunked_book_descriptions = list(chunked(book_descriptions, cards_per_page))
     os.makedirs('pages', exist_ok=True)
-    for i, books_chunk in enumerate(chunked_book_descriptions):
-        rendered_page = template.render(books=books_chunk, pages=range(0, len(chunked_book_descriptions)), current_page=i, last_page=len(chunked_book_descriptions))
-        with open(os.path.join('pages', f'index{i+1}.html'), 'w', encoding="utf8") as file:
+    for books_chunk_number, books_chunk in enumerate(chunked_book_descriptions):
+        rendered_page = template.render(books=books_chunk, pages=range(0, len(chunked_book_descriptions)), current_page=books_chunk_number, last_page=len(chunked_book_descriptions))
+        with open(os.path.join('pages', f'index{books_chunk_number+1}.html'), 'w', encoding="utf8") as file:
             file.write(rendered_page)
 
 
