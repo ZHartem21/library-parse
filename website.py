@@ -11,7 +11,7 @@ def get_book_descriptions(book_information):
     book_descriptions = json.loads(book_information)
     for book_description in book_descriptions:
         if book_description['image_path']:
-            book_description['image_path'] = os.path.join('../tulululib/images', book_description['image_path'].split("/")[4]).replace('\\', '/')
+            book_description['image_path'] = os.path.join('../tulululib/images', book_description['image_path'].split('/')[4]).replace('\\', '/')
         book_filename = book_description['title'].replace(':', '')
         book_description['text_path'] = os.path.join('../tulululib/books', f'{book_filename}.txt').replace('\\', '/')
     return book_descriptions
@@ -28,7 +28,7 @@ def on_reload(book_information, cards_per_page):
     os.makedirs('pages', exist_ok=True)
     for books_chunk_number, books_chunk in enumerate(chunked_book_descriptions, start=1):
         rendered_page = template.render(books=books_chunk, pages=range(0, len(chunked_book_descriptions)), current_page=books_chunk_number, last_page=len(chunked_book_descriptions))
-        with open(os.path.join('pages', f'index{books_chunk_number}.html'), 'w', encoding="utf8") as file:
+        with open(os.path.join('pages', f'index{books_chunk_number}.html'), 'w', encoding='utf8') as file:
             file.write(rendered_page)
 
 
