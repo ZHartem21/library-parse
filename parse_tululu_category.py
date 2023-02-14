@@ -73,7 +73,7 @@ def main():
     parser.add_argument('--start_page', help='Начальная страница, по умолчанию 1', type=int, default=1)
     parser.add_argument('--end_page', help='Конечная страница, по умолчанию 10000', type=int, default=10000)
     parser.add_argument('--category', help='Категория для парсера, по умолчанию "l55" - научная фантастика', type=str, default='l55')
-    parser.add_argument('--dest_folder', help='Путь к каталогу с результатами парсинга: картинкам, книгам, JSON, по умолчанию "tulululib"', type=str, default='tulululib')
+    parser.add_argument('--dest_folder', help='Путь к каталогу с результатами парсинга: картинкам, книгам, JSON, по умолчанию "media"', type=str, default='media')
     parser.add_argument('--skip_img', help='Не скачивать картинки, по умолчанию False', action='store_true')
     parser.add_argument('--skip_text', help='Не скачивать текст, по умолчанию False', action='store_true')
     parser.add_argument('--json_name', help='Название .json файла с результатами, по умолчанию "book_information.json"', type=str, default='book_information.json')
