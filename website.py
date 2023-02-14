@@ -18,8 +18,10 @@ def get_book_descriptions(book_information_file):
     return book_descriptions
 
 
-def on_reload(book_information_file, cards_per_page):
+def on_reload():
     print('Reloading')
+    book_information_file = main.book_information_file
+    cards_per_page = main.cards_per_page
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -39,9 +41,11 @@ def main():
     parser.add_argument('--book_information_file', help='Название .json файла с информацией о книгах, по умолчанию "book_information.json"', type=str, default='book_information.json')
     parser.add_argument('--cards_per_page', help='Количество карточек книг на одной странице', type=int, default=20)
     args = parser.parse_args()
-    on_reload(args.book_information_file, args.cards_per_page)
+    main.book_information_file = args.book_information_file
+    main.cards_per_page = args.cards_per_page
+    on_reload()
     server = Server()
-    server.watch('template.html', on_reload(args.book_information_file, args.cards_per_page))
+    server.watch('template.html', on_reload)
     server.serve(root='.', default_filename='pages/index1.html')
 
 
