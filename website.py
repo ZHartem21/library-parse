@@ -8,7 +8,7 @@ from more_itertools import chunked
 
 
 def get_book_descriptions(book_information_file):
-    with open(book_information_file, "r", encoding="utf8") as json_file:
+    with open(book_information_file, 'r', encoding='utf8') as json_file:
         book_descriptions = json.load(json_file)
     for book_description in book_descriptions:
         if book_description['image_path']:
@@ -19,6 +19,7 @@ def get_book_descriptions(book_information_file):
 
 
 def on_reload(book_information_file, cards_per_page):
+    print('Reloading')
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
